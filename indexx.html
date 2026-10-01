@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Staff Control Center V11</title>
+<style>
+:root{--bg:#030806;--bg2:#06100c;--panel:#08130f;--panel2:#0b1813;--line:#173127;--line2:#214739;--green:#20df95;--green2:#0eb879;--mint:#63f4bd;--text:#f2faf6;--muted:#769487;--red:#ff5870;--yellow:#ffd166;--shadow:0 18px 55px rgba(0,0,0,.28)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 70% -15%,#123b2a 0,#07140f 27%,#030806 65%);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{min-height:100vh}.sidebar{position:fixed;left:0;top:0;bottom:0;width:252px;background:rgba(4,12,9,.96);border-right:1px solid var(--line);padding:18px 13px;z-index:10}.brand{height:58px;display:flex;align-items:center;gap:11px;padding:0 10px 17px;border-bottom:1px solid var(--line)}.logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(145deg,#2af3a8,#079663);display:grid;place-items:center;box-shadow:0 8px 30px #20df9522}.logo svg{width:23px}.brand h1{font-size:14px;letter-spacing:.7px;margin:0}.brand small{display:block;font-size:8px;color:var(--green);letter-spacing:2px;font-weight:900;margin-top:3px}
+.label{font-size:8px;letter-spacing:1.7px;color:#557466;text-transform:uppercase;margin:21px 10px 7px}.nav{width:100%;display:flex;align-items:center;gap:11px;border:1px solid transparent;background:transparent;color:#8ba69a;border-radius:10px;padding:10px 11px;margin:3px 0;text-align:left;font-size:11px;transition:.18s}.nav svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}.nav:hover{background:#0a2118;color:#eafff5}.nav.active{background:linear-gradient(100deg,#10bd7e,#078a60);border-color:#32e9a633;color:#fff;box-shadow:0 9px 25px #0cae7624}.nav .count{margin-left:auto;background:#153428;color:#8ff7c7;padding:2px 6px;border-radius:12px;font-size:8px}.userbox{position:absolute;left:13px;right:13px;bottom:15px;border:1px solid var(--line);border-radius:12px;background:#07130f;padding:10px;display:flex;gap:9px;align-items:center}.avatar{width:34px;height:34px;border-radius:10px;background:#0c3929;color:var(--mint);border:1px solid #1aa873;display:grid;place-items:center;font-weight:900;font-size:11px}.userbox b{font-size:10px}.ulogout{margin-left:auto}.userbox small{display:block;color:var(--muted);font-size:8px;margin-top:3px}.online-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 9px var(--green)}
+main{margin-left:252px;padding:20px 25px 35px}.top{height:59px;display:flex;align-items:center;justify-content:space-between;margin-bottom:19px}.title h2{margin:0;font-size:21px}.title p{margin:4px 0 0;color:var(--muted);font-size:10px}.topright{display:flex;align-items:center;gap:7px}.topbtn{height:35px;border:1px solid var(--line);background:#07140f;color:#9ab2a7;border-radius:9px;padding:0 11px;font-size:10px}.topbtn:hover{border-color:#2a604b;color:#fff}.live{display:flex;align-items:center;gap:6px;color:#8ed8b9;font-size:9px;padding:0 9px}.pages{width:100%}.page{display:none}.page.active{display:block}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.stat{position:relative;overflow:hidden;border:1px solid var(--line);background:linear-gradient(145deg,#091812,#07110d);border-radius:14px;padding:14px;box-shadow:var(--shadow)}.stat:after{content:"";position:absolute;width:100px;height:100px;border-radius:50%;right:-35px;bottom:-55px;background:#20df9510}.stat-icon{width:32px;height:32px;border-radius:9px;background:#0c2b20;color:var(--green);display:grid;place-items:center;margin-bottom:11px}.stat-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.stat b{font-size:21px}.stat span{display:block;color:var(--muted);font-size:9px;margin-top:3px}.trend{font-size:8px!important;color:#5ce5ae!important;margin-top:8px!important}
+.grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.65fr);gap:13px;margin-top:13px}.panel{background:rgba(7,17,13,.9);border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:var(--shadow)}.panel+.panel{margin-top:13px}.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.head h3{font-size:13px;margin:0}.head small{display:block;color:var(--muted);font-size:9px;margin-top:4px}.btn{border:0;background:linear-gradient(100deg,#10bd7e,#078f64);color:white;border-radius:8px;padding:8px 11px;font-size:9px;font-weight:800}.btn.secondary{background:#0b2018;border:1px solid var(--line);color:#9bb5a8}.btn.red{background:#5e202b}.btn.yellow{background:#5a4815}.btn:hover{filter:brightness(1.1)}
+.table{width:100%;border-collapse:collapse}.table th{text-align:left;color:#5d786b;font-size:8px;text-transform:uppercase;letter-spacing:.8px;padding:8px;border-bottom:1px solid var(--line)}.table td{font-size:10px;padding:10px 8px;border-bottom:1px solid #11241d}.table tr:last-child td{border:0}.player{display:flex;align-items:center;gap:8px}.picon{width:28px;height:28px;border-radius:8px;background:#0c2b20;color:#79efbb;display:grid;place-items:center;font-size:9px;font-weight:800}.player b{font-size:10px}.player small{display:block;color:#5e7a6d;font-size:8px;margin-top:2px}.badge{display:inline-flex;border-radius:15px;padding:4px 7px;font-size:7px;font-weight:900;letter-spacing:.3px}.bgreen{background:#073a2b;color:#65eab4}.bgray{background:#15221d;color:#94a89f}.byellow{background:#3b3011;color:#ffd66f}.bred{background:#401d25;color:#ff8595}.bblue{background:#0c3028;color:#78eec0}.actions{display:flex;gap:4px}.mini{height:26px;min-width:27px;border:1px solid var(--line);background:#07150f;color:#8ba79a;border-radius:7px;font-size:9px}.mini:hover{border-color:#27c991;color:#fff}
+.activity{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #11241d}.activity:last-child{border:0}.aicon{width:29px;height:29px;border-radius:8px;background:#0b2a1f;color:var(--green);display:grid;place-items:center;font-size:10px;font-weight:900}.activity b{font-size:9px}.activity small{display:block;color:#5f7b6e;font-size:8px;margin-top:3px}.time{color:#486457;font-size:8px}
+.searchbar{display:flex;gap:7px;margin-bottom:11px}.searchbar input{flex:1;background:#06110d;border:1px solid var(--line);color:white;border-radius:9px;padding:10px;outline:0;font-size:10px}.searchbar input:focus{border-color:#21c88f}.filters{display:flex;gap:6px}.filters select{background:#06110d;color:#91a99e;border:1px solid var(--line);padding:8px;border-radius:8px;font-size:9px;outline:0}
+.report{display:grid;grid-template-columns:50px 1fr auto;gap:10px;padding:13px 0;border-bottom:1px solid #11241d;align-items:center}.report:last-child{border:0}.rid{font-size:9px;color:#5b776b}.report b{font-size:10px}.report small{display:block;color:var(--muted);font-size:8px;margin-top:4px}.priority{padding:4px 7px;border-radius:12px;font-size:7px;font-weight:900}.high{background:#451f26;color:#ff8998}.med{background:#3c3113;color:#ffd56d}.low{background:#093326;color:#63eab5}
+.detail{display:grid;grid-template-columns:1fr 1fr;gap:8px}.detailbox{background:#07130f;border:1px solid var(--line);border-radius:10px;padding:11px}.detailbox label{font-size:7px;color:#557467;text-transform:uppercase;letter-spacing:1px}.detailbox b{display:block;font-size:11px;margin-top:5px}
+.chart{height:135px;display:flex;align-items:end;gap:7px;padding:12px 4px 2px}.barc{flex:1;background:linear-gradient(to top,#0aa976,#4beab1);border-radius:5px 5px 2px 2px;min-height:14px;box-shadow:0 0 18px #20df9510}.chart-labels{display:flex;gap:7px;color:#4f6c5e;font-size:7px}.chart-labels span{flex:1;text-align:center}
+.form{display:grid;gap:8px;max-width:650px}.form label{color:#6d8a7c;font-size:9px}.form input,.form select,.form textarea{background:#06110d;color:#fff;border:1px solid var(--line);border-radius:9px;padding:10px;outline:0}.form textarea{min-height:100px;resize:vertical}
+
+
+.site-login{position:fixed;inset:0;background:rgba(1,7,4,.98);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;z-index:300}
+.site-login.hidden{display:none}
+.site-login-card{width:min(410px,92vw);background:linear-gradient(145deg,#091812,#06100c);border:1px solid #285d48;border-radius:20px;padding:30px;box-shadow:0 35px 110px #000}
+.login-kicker{text-align:center;color:#20df95;font-size:8px;font-weight:900;letter-spacing:2px;margin-bottom:8px}
+.site-login-card h2{text-align:center;margin:0;font-size:20px}.site-login-card>p{text-align:center;color:#668276;font-size:9px;margin:7px 0 21px}
+.login-note{text-align:center;color:#48675a;font-size:8px;margin-top:14px}
+
+.login-overlay{position:fixed;inset:0;background:rgba(1,7,4,.94);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;z-index:200}
+.login-overlay.show{display:flex}
+.login-card{width:min(390px,92vw);background:linear-gradient(145deg,#091812,#06100c);border:1px solid #235640;border-radius:18px;padding:28px;box-shadow:0 30px 100px #000}
+.login-logo{width:54px;height:54px;border-radius:15px;background:linear-gradient(145deg,#20df95,#078f64);display:grid;place-items:center;margin:0 auto 17px;box-shadow:0 10px 35px #20df9522}
+.login-logo svg{width:27px}
+.login-card h2{text-align:center;margin:0;font-size:18px}
+.login-card>p{text-align:center;color:#668276;font-size:9px;margin:7px 0 22px}
+.login-form{display:grid;gap:8px}
+.login-form label{font-size:8px;color:#6d8b7d;text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.login-form input{width:100%;background:#040c08;border:1px solid #19392d;color:#fff;border-radius:9px;padding:11px;outline:none;font-size:10px}
+.login-form input:focus{border-color:#20df95;box-shadow:0 0 0 2px #20df9510}
+.login-btn{border:0;background:linear-gradient(100deg,#10bd7e,#078f64);color:#fff;border-radius:9px;padding:11px;margin-top:7px;font-size:10px;font-weight:900;letter-spacing:.8px}
+.login-btn:hover{filter:brightness(1.08)}
+.login-error{display:none;color:#ff7d8d;background:#3b1820;border:1px solid #652b37;border-radius:8px;padding:8px;font-size:8px;text-align:center}
+
+
+.am-login{position:fixed;inset:0;background:rgba(1,7,4,.97);backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;z-index:260}
+.am-login.show{display:flex}.am-card{width:min(400px,92vw);background:#091812;border:1px solid #285d48;border-radius:19px;padding:28px;box-shadow:0 30px 100px #000}.am-card h2{text-align:center;margin:0;font-size:19px}.am-card p{text-align:center;color:#668276;font-size:9px;margin:7px 0 21px}.am-error{display:none;color:#ff8291;background:#3b1820;border:1px solid #652b37;border-radius:8px;padding:8px;font-size:8px;text-align:center}
+.am-table{width:100%;border-collapse:collapse}.am-table th{text-align:left;color:#5d786b;font-size:8px;text-transform:uppercase;padding:9px;border-bottom:1px solid #19392d}.am-table td{padding:11px 9px;border-bottom:1px solid #10261d;font-size:9px}.am-badge{padding:4px 7px;border-radius:12px;font-size:7px;font-weight:900}.am-on{background:#073a2b;color:#65eab4}.am-off{background:#302018;color:#f1a084}
+
+
+.am-wrap{max-width:1125px;margin:0 auto;padding:18px 0 35px}.am-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.am-brand{display:flex;align-items:center;gap:12px}.am-logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(145deg,#20df95,#078f64);display:grid;place-items:center}.am-logo svg{width:24px}.am-brand h2{font-size:16px;margin:0}.am-brand small{font-size:7px;color:#20df95;letter-spacing:2px;font-weight:900}.am-actions{display:flex;gap:7px}.am-grid{display:grid;grid-template-columns:360px 1fr;gap:14px}.am-panel{background:rgba(7,17,13,.94);border:1px solid #1b392d;border-radius:16px;padding:17px;box-shadow:0 18px 55px #0005}.am-panel h3{font-size:13px;margin:0 0 5px}.am-panel p{font-size:8px;color:#668276;margin:0 0 16px}.am-form{display:grid;gap:7px}.am-form label{font-size:7px;color:#688376;letter-spacing:1px}.am-form input,.am-form select{background:#05100b;color:#fff;border:1px solid #1b392d;border-radius:9px;padding:11px;font-size:9px;outline:0}.am-form input:focus,.am-form select:focus{border-color:#20df95}.am-create{border:0;background:linear-gradient(100deg,#10bd7e,#078f64);color:#fff;border-radius:9px;padding:11px;font-size:9px;font-weight:900;cursor:pointer;margin-top:3px}.am-security{margin-top:14px;background:#07130f;border:1px solid #1b392d;border-radius:12px;padding:12px;color:#58766a;font-size:8px;line-height:1.65}.am-security b{color:#688b7d}.am-security span{color:#20df95;font-weight:900}.am-accounts{min-height:430px}.am-account-head{display:flex;justify-content:space-between;align-items:flex-start}.am-account-head>b{font-size:10px;color:#20df95;padding-top:3px}.am-table-wrap{overflow:auto}.am-accounts table{width:100%;border-collapse:collapse}.am-accounts th{text-align:left;color:#5d786b;font-size:7px;letter-spacing:.8px;padding:9px;border-bottom:1px solid #19392d}.am-accounts td{padding:12px 9px;border-bottom:1px solid #10261d;font-size:9px}.am-accounts tbody tr:last-child td{border-bottom:0}.am-badge{display:inline-flex;border-radius:12px;padding:4px 7px;font-size:6px;font-weight:900}.am-on{background:#073a2b;color:#65eab4}.am-off{background:#302018;color:#f1a084}.am-owner{background:#431925;color:#ff8294}.am-action{border:1px solid #1b392d;background:#07140f;color:#9ab3a7;border-radius:6px;padding:5px 7px;font-size:7px;cursor:pointer}.am-action:hover{border-color:#20df95;color:#fff}.am-msg{display:none;font-size:7px;padding:7px;border-radius:7px}.am-msg.ok{display:block;background:#083426;color:#67eab5}.am-msg.bad{display:block;background:#3b1820;color:#ff8291}@media(max-width:850px){.am-grid{grid-template-columns:1fr}.am-top{align-items:flex-start;gap:10px}.am-actions{flex-wrap:wrap}}
+
+.toast{position:fixed;right:22px;bottom:20px;background:#092218;border:1px solid #2a765a;color:#c8fbe6;padding:11px 14px;border-radius:10px;font-size:9px;box-shadow:var(--shadow);opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s;z-index:99}.toast.show{opacity:1;transform:none}
+.modal{position:fixed;inset:0;background:#0009;backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:80}.modal.show{display:flex}.modalbox{width:min(480px,92vw);background:#08140f;border:1px solid #255a46;border-radius:16px;padding:18px;box-shadow:0 25px 100px #000}.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.modalhead h3{margin:0;font-size:14px}.close{background:transparent;border:0;color:#6f897d;font-size:18px}.quickgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.quick{border:1px solid var(--line);background:#07140f;color:#9ab3a7;border-radius:9px;padding:10px;text-align:left;font-size:9px}.quick:hover{border-color:#26c991;color:white;background:#0a2118}
+@media(max-width:1150px){.stats{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}}@media(max-width:760px){.sidebar{width:68px;padding:12px 7px}.brand{justify-content:center;border:0;padding:0}.brand>div:last-child,.label,.nav span,.nav .count,.userbox>div:nth-child(2){display:none}.nav{justify-content:center;padding:12px}.userbox{justify-content:center;padding:7px;flex-direction:column}.ulogout{margin:0}main{margin-left:68px;padding:14px}.stats{grid-template-columns:repeat(2,1fr)}.topright .topbtn{display:none}.table th:nth-child(4),.table td:nth-child(4){display:none}}@media(max-width:450px){.stats{grid-template-columns:1fr}.detail{grid-template-columns:1fr}}
+.online-dot.off{background:var(--red);box-shadow:0 0 9px var(--red)}.empty{color:var(--muted);font-size:10px;text-align:center;padding:22px 10px;line-height:1.6}.table td.empty{padding:26px 10px}.srvmsg{display:none;font-size:9px;padding:8px;border-radius:7px;line-height:1.5}.srvmsg.ok{display:block;background:#083426;color:#67eab5}.srvmsg.bad{display:block;background:#3b1820;color:#ff8291}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+<div class="brand"><div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16M6 10v8M10 10v8M14 10v8M18 10v8M4 21h16M12 3l9 5H3l9-5Z"/></svg></div><div><h1>STAFF CONTROL</h1><small>CONTROL CENTER V11</small></div></div>
+<div class="label">Principal</div>
+<button class="nav active" data-page="dashboard"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg><span>Dashboard</span></button>
+<button class="nav" data-page="players"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2-5 6-5s6 2 6 5M17 11c2 0 4 1 4 3M17 15c2 0 4 1 4 5"/></svg><span>Jugadores</span><i class="count" id="cPlayers">0</i></button>
+<button class="nav" data-page="reports"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg><span>Reportes</span><i class="count" id="cReports">0</i></button>
+<button class="nav" data-page="staff"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/></svg><span>Staff</span></button>
+<div class="label">Moderación</div>
+<button class="nav" data-page="punishments"><svg viewBox="0 0 24 24"><path d="M7 3h10v18H7zM9 7h6M9 11h6M9 15h4"/></svg><span>Sanciones</span></button>
+<button class="nav" data-page="logs" onclick="requestLogsLogin(event)"><svg viewBox="0 0 24 24"><path d="M5 5h14M5 12h14M5 19h14"/></svg><span>Logs</span></button>
+<button class="nav" data-page="spectate"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg><span>Spectate</span></button>
+<button class="nav" data-page="tickets"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4zM8 10h8M8 14h5"/></svg><span>Tickets</span></button>
+<button class="nav" data-page="accountmanager" onclick="requestAccountManager(event)"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5M19 8h3M20.5 6.5v3"/></svg><span>Staff Account Manager</span></button>
+<div class="userbox"><div class="avatar" id="uAvatar">D</div><div><b id="uName">Dotty</b><small><span class="online-dot"></span> <span id="uRole">Administrador</span></small></div><button class="mini ulogout" title="Cerrar sesión" onclick="logoutSite()">⏻</button></div>
+</aside>
+
+<main>
+<header class="top"><div class="title"><h2 id="title">Dashboard</h2><p id="subtitle">Centro de control administrativo · Servidor conectado</p></div><div class="topright"><div class="live"><span class="online-dot off" id="liveDot"></span> <span id="liveTxt">SIN SERVIDOR</span></div><button class="topbtn" onclick="notif()">Notificaciones</button><button class="topbtn" id="srvBtn" onclick="openServerModal()">Conectar servidor</button></div></header>
+
+<div class="pages">
+<section id="dashboard" class="page active">
+<div class="stats">
+<div class="stat"><div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2-5 6-5s6 2 6 5"/></svg></div><b id="sPlayers">–</b><span>Jugadores online</span><em class="trend" id="sPlayersT">Sin conexión</em></div>
+<div class="stat"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8"/></svg></div><b id="sReports">–</b><span>Reportes pendientes</span><em class="trend" id="sReportsT">Sin conexión</em></div>
+<div class="stat"><div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/></svg></div><b id="sStaff">–</b><span>Staff conectado</span><em class="trend" id="sStaffT">Sin conexión</em></div>
+<div class="stat"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M4 18 9 13l3 3 7-8M15 8h4v4"/></svg></div><b id="sSlots">–</b><span>Slots ocupados</span><em class="trend" id="sSlotsT">Sin conexión</em></div>
+<div class="stat"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.2 8.2-8 10-4.8-1.8-8-5-8-10V6l8-3Z"/><path d="m8 12 2.5 2.5L16 9"/></svg></div><b id="sUptime">–</b><span>Uptime</span><em class="trend" id="sUptimeT">Sin conexión</em></div>
+</div>
+<div class="grid"><div>
+<div class="panel"><div class="head"><div><h3>Jugadores conectados</h3><small>Actividad en tiempo real</small></div><button class="btn" data-page="players">Gestionar jugadores</button></div><table class="table"><thead><tr><th>Jugador</th><th>ID</th><th>Trabajo</th><th>Ping</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="dashPlayers"></tbody></table></div>
+<div class="panel"><div class="head"><div><h3>Actividad reciente</h3><small>Últimas acciones administrativas</small></div><button class="btn secondary" onclick="requestLogsLogin(event)">Ver logs</button></div><div id="activity"></div></div>
+</div>
+<div>
+<div class="panel"><div class="head"><div><h3>Reportes</h3><small>Requieren atención</small></div><button class="btn secondary" data-page="reports">Todos</button></div><div id="miniReports"></div></div>
+<div class="panel"><div class="head"><div><h3>Actividad del servidor</h3><small>Máximo de jugadores por hora · últimas 8 horas</small></div></div><div class="chart" id="chart"></div><div class="chart-labels" id="chartLabels"></div></div>
+</div></div>
+</section>
+
+<section id="players" class="page"><div class="panel"><div class="head"><div><h3>Gestión de jugadores</h3><small>Busca, inspecciona y administra jugadores</small></div><button class="btn" onclick="refreshNow()">Sincronizar</button></div><div class="searchbar"><input id="search" placeholder="Buscar por nombre, ID o trabajo..." oninput="renderPlayers()"><div class="filters"><select id="playerFilter" onchange="renderPlayers()"><option value="">Todos</option><option value="online">Online</option><option value="staff">Staff</option></select></div></div><table class="table"><thead><tr><th>Jugador</th><th>ID</th><th>Trabajo</th><th>Ping</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="fullPlayers"></tbody></table></div></section>
+
+<section id="reports" class="page"><div class="panel"><div class="head"><div><h3>Centro de reportes</h3><small>Gestiona las incidencias de la comunidad</small></div><div class="filters"><select id="reportFilter" onchange="renderReports()"><option value="">Todos</option><option value="Alta">Alta prioridad</option><option value="Media">Media</option><option value="Baja">Baja</option></select></div></div><div id="reportsList"></div></div></section>
+
+<section id="staff" class="page"><div class="panel"><div class="head"><div><h3>Equipo administrativo</h3><small>Rangos, permisos y presencia del staff</small></div><button class="btn" onclick="requestAccountManager(event)">Añadir miembro</button></div><table class="table"><thead><tr><th>Miembro</th><th>Rango</th><th>Permisos</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="staffBody"></tbody></table></div></section>
+
+<section id="punishments" class="page"><div class="panel"><div class="head"><div><h3>Historial de sanciones</h3><small>Registro de warns, kicks, bans y otras acciones</small></div><button class="btn red" onclick="openModal('Nueva sanción')">Nueva sanción</button></div><table class="table"><thead><tr><th>Jugador</th><th>Tipo</th><th>Motivo</th><th>Staff</th><th>Fecha</th></tr></thead><tbody id="punishBody"></tbody></table></div></section>
+
+<section id="logs" class="page"><div class="panel"><div class="head"><div><h3>Logs administrativos</h3><small>Auditoría de acciones realizadas por el staff</small></div><button class="btn secondary" onclick="renderLogs();toast('Logs actualizados')">Actualizar</button></div><div id="logsList"></div></div></section>
+
+<section id="spectate" class="page"><div class="panel"><div class="head"><div><h3>Spectate Center</h3><small>Selecciona un jugador para observarlo</small></div></div><div class="searchbar"><input id="specSearch" placeholder="Buscar jugador..." oninput="selectSpectate()"><button class="btn" onclick="startSpectate()">Iniciar spectate</button></div><div class="detail"><div class="detailbox"><label>Jugador seleccionado</label><b id="specName">—</b></div><div class="detailbox"><label>ID / Ping</label><b id="specInfo">—</b></div><div class="detailbox"><label>Ubicación</label><b id="specLoc">—</b></div><div class="detailbox"><label>Estado</label><b id="specState">—</b></div></div></div></section>
+
+<section id="tickets" class="page"><div class="panel"><div class="head"><div><h3>Centro de tickets</h3><small>Solicitudes de soporte de los jugadores</small></div><button class="btn" onclick="refreshNow()">Actualizar</button></div><div id="ticketsList"></div></div></section>
+
+
+<section id="accountmanager" class="page">
+  <div class="am-wrap">
+    <header class="am-top">
+      <div class="am-brand">
+        <div class="am-logo"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v5c0 5-3.2 8.2-8 10-4.8-1.8-8-5-8-10V6l8-3Z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <div><h2>ACCOUNT MANAGER</h2><small>STAFF CONTROL CENTER V11</small></div>
+      </div>
+      <div class="am-actions">
+        <button class="btn secondary" onclick="amRefresh()">Actualizar</button>
+        <button class="btn red" onclick="amLogout()">Cerrar sesión</button>
+      </div>
+    </header>
+    <div class="am-grid">
+      <div>
+        <div class="am-panel">
+          <h3>Crear cuenta</h3><p>Crea accesos para administradores, moderadores o soporte.</p>
+          <div class="am-form">
+            <label>USUARIO</label><input id="amNewUser" placeholder="ej. moderador01">
+            <label>CONTRASEÑA</label><input id="amNewPass" type="password" placeholder="Contraseña segura">
+            <label>RANGO</label><select id="amNewRole"><option>Administrador</option><option>Moderador</option><option>Soporte</option></select>
+            <button class="am-create" onclick="amCreateAccount()">Crear cuenta</button>
+            <div id="amCreateMsg" class="am-msg"></div>
+          </div>
+        </div>
+        <div class="am-security"><b>Control de sesiones</b><br>Una cuenta solo puede tener una sesión activa. Si una cuenta está marcada como activa, otro acceso será rechazado hasta que la sesión expire o el propietario la cierre desde este panel.<br><span>Sesión: 2 minutos sin actividad</span></div>
+      </div>
+      <div class="am-panel am-accounts">
+        <div class="am-account-head"><div><h3>Cuentas autorizadas</h3><p>Gestiona quién puede entrar al Staff Control Center.</p></div><b id="amAccountCount">0 cuentas</b></div>
+        <div class="am-table-wrap"><table><thead><tr><th>USUARIO</th><th>RANGO</th><th>SESIÓN</th><th>CREADA</th><th>ACCIONES</th></tr></thead><tbody id="amAccountsBody"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+</main>
+
+
+
+<div class="site-login" id="siteLogin">
+  <div class="site-login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3 20 6v5c0 5-3.2 8.2-8 10-4.8-1.8-8-5-8-10V6l8-3Z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <div class="login-kicker">STAFF CONTROL CENTER V11</div>
+    <h2>Acceso al panel</h2>
+    <p>Introduce tu cuenta autorizada para continuar.</p>
+    <div class="login-form">
+      <label>Usuario</label>
+      <input id="siteUser" type="text" autocomplete="username" placeholder="Usuario">
+      <label>Contraseña</label>
+      <input id="sitePass" type="password" autocomplete="current-password" placeholder="Contraseña">
+      <div class="login-error" id="siteLoginError">Usuario o contraseña incorrectos.</div>
+      <button class="login-btn" onclick="loginSite()">LOGIN</button>
+    </div>
+    <div class="login-note">Una cuenta solo puede mantener una sesión activa.</div>
+  </div>
+</div>
+
+
+<div class="am-login" id="amLogin">
+ <div class="am-card">
+  <div class="login-logo"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7"><circle cx="12" cy="8" r="3"/><path d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5"/></svg></div>
+  <h2>Staff Account Manager</h2><p>Acceso exclusivo del propietario.</p>
+  <div class="form"><label>Usuario</label><input id="amUser" autocomplete="username" placeholder="Usuario Owner"><label>Contraseña</label><input id="amPass" type="password" autocomplete="current-password" placeholder="Contraseña"><div class="am-error" id="amError">Credenciales de Owner incorrectas.</div><button class="login-btn" onclick="loginAccountManager()">LOGIN</button></div>
+ </div>
+</div>
+
+<div class="login-overlay" id="logsLogin">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3 20 6v5c0 5-3.2 8.2-8 10-4.8-1.8-8-5-8-10V6l8-3Z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <h2>Acceso a Logs</h2>
+    <p>Inicia sesión para acceder al registro administrativo.</p>
+    <div class="login-form">
+      <label>Usuario</label>
+      <input id="logUser" type="text" autocomplete="username" placeholder="Introduce tu usuario">
+      <label>Contraseña</label>
+      <input id="logPass" type="password" autocomplete="current-password" placeholder="Introduce tu contraseña">
+      <div class="login-error" id="loginError">Usuario o contraseña incorrectos.</div>
+      <button class="login-btn" onclick="loginLogs()">LOGIN</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal"><div class="modalbox"><div class="modalhead"><h3 id="modalTitle">Acción administrativa</h3><button class="close" onclick="closeModal()">×</button></div><div class="form" style="max-width:none;margin-bottom:10px"><input id="modalPlayer" list="playerList" placeholder="Jugador"><datalist id="playerList"></datalist><input id="modalReason" placeholder="Motivo (opcional)"></div><div class="quickgrid"><button class="quick" onclick="staffAction('WARN')">Advertir jugador</button><button class="quick" onclick="staffAction('KICK')">Kick</button><button class="quick" onclick="staffAction('Freeze')">Freeze</button><button class="quick" onclick="staffAction('Teleport')">Teleport</button><button class="quick" onclick="staffAction('BAN')">Ban</button><button class="quick" onclick="staffAction('Perfil')">Ver perfil</button></div></div></div>
+<div class="modal" id="serverModal"><div class="modalbox"><div class="modalhead"><h3>Conectar servidor MTA:SA</h3><button class="close" onclick="closeServerModal()">×</button></div>
+<div class="form" style="max-width:none">
+<label>IP del servidor</label><input id="srvIp" placeholder="IP (123.45.67.89) o https://tu-dominio.com">
+<label>Puerto HTTP (ignorado si usas https://)</label><input id="srvPort" placeholder="22005">
+<label>Recurso</label><input id="srvRes" placeholder="staffpanel">
+<label>Clave (opcional)</label><input id="srvKey" placeholder="Solo letras y números">
+<div class="srvmsg" id="srvMsg"></div>
+<div class="actions" style="gap:8px;margin-top:4px"><button class="btn" onclick="saveServer()">Guardar y conectar</button><button class="btn secondary" onclick="disconnectServer()">Desconectar</button></div>
+</div></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const LS_SRV='staff_v11_server_v1',LS_ACT='staff_v11_activity_v1',LS_PUN='staff_v11_punish_v1';
+function lsGet(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+let players=[],reports=[],history=[];
+let srvCfg=lsGet(LS_SRV,null),srv={ok:false,err:'',ms:0,max:0,uptime:0,name:'',skew:0};
+let logs=lsGet(LS_ACT,[]),punish=lsGet(LS_PUN,[]);
+const titles={dashboard:['Dashboard','Centro de control administrativo · Servidor conectado'],players:['Jugadores','Gestión, moderación y acciones en tiempo real'],reports:['Reportes','Centro de incidencias de la comunidad'],staff:['Staff','Equipo administrativo, rangos y permisos'],punishments:['Sanciones','Historial disciplinario del servidor'],logs:['Logs','Auditoría de acciones administrativas'],spectate:['Spectate Center','Observación de jugadores en tiempo real'],tickets:['Tickets','Centro de soporte y solicitudes']};
+function toast(t){let x=document.getElementById('toast');x.textContent=t;x.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove('show'),2200)}
+function openModal(t,p){document.getElementById('modalTitle').textContent=t;const s=document.getElementById('modalPlayer');s.innerHTML=players.map(x=>`<option>${x[0]}</option>`).join('');if(p)s.value=p;document.getElementById('modalReason').value='';document.getElementById('modal').classList.add('show')}function closeModal(){document.getElementById('modal').classList.remove('show')}
+function currentUser(){const s=getSession();return s?s.user:'Staff'}
+function updateUserBox(){const s=getSession();if(!s)return;const a=getAccounts().find(x=>x.user===s.user);document.getElementById('uName').textContent=s.user;document.getElementById('uAvatar').textContent=s.user[0].toUpperCase();document.getElementById('uRole').textContent=a?a.role:''}
+function logEvent(text,who){logs.unshift([who||currentUser(),text,Math.floor(Date.now()/1000)]);logs=logs.slice(0,200);lsSet(LS_ACT,logs);renderLogs()}
+function viewProfile(name){const p=players.find(x=>x[0]===name);toast(p?p[0]+' · ID '+p[1]+' · '+p[2]+' · '+p[3]+' ms':'Jugador no conectado')}
+function staffAction(type){
+  const p=document.getElementById('modalPlayer').value.trim(),r=document.getElementById('modalReason').value.trim()||'Sin motivo especificado',who=currentUser(),d=new Date();
+  if(!p){toast('Escribe o elige un jugador');return}
+  if(type==='Perfil'){closeModal();viewProfile(p);return}
+  const m=['ene.','feb.','mar.','abr.','may.','jun.','jul.','ago.','sept.','oct.','nov.','dic.'];
+  const txt={WARN:'Registró WARN a ',KICK:'Registró KICK a ',BAN:'Registró BAN a ',Freeze:'Solicitó freeze de ',Teleport:'Solicitó teleport a '}[type]+p;
+  if(['WARN','KICK','BAN'].includes(type)){punish.unshift([p,type,r,who,d.getDate()+' '+m[d.getMonth()]]);punish=punish.slice(0,200);lsSet(LS_PUN,punish);renderPunish()}
+  logEvent(txt);closeModal();toast(txt);
+}
+let specTarget=null;
+function specShow(){const p=specTarget,g=id=>document.getElementById(id);g('specName').textContent=p?p[0]:'—';g('specInfo').textContent=p?p[1]+' · '+p[3]+' ms':'—';g('specLoc').textContent=p?(p[5]||'—'):'—';g('specState').innerHTML=p?'<span class="online-dot"></span> En línea':'—'}
+function selectSpectate(){const q=document.getElementById('specSearch').value.toLowerCase().trim();specTarget=q?(players.find(x=>x[0].toLowerCase().includes(q)||String(x[1])===q)||null):null;specShow()}
+function startSpectate(){if(!specTarget){toast('Busca y selecciona un jugador conectado');return}logEvent('Solicitó spectate a '+specTarget[0]);toast('Spectate registrado: '+specTarget[0])}
+
+
+const ACCOUNT_KEY='staff_v11_accounts_v1';
+const SESSION_KEY='staff_v11_session_v1';
+const SESSION_TTL=120000;
+function getAccounts(){
+  try{return JSON.parse(localStorage.getItem(ACCOUNT_KEY)||'[]')}catch(e){return []}
+}
+function saveAccounts(a){localStorage.setItem(ACCOUNT_KEY,JSON.stringify(a))}
+function ensureOwner(){
+  const a=getAccounts();
+  if(!a.length){
+    a.push({user:'dottygunner',pass:'1212131415',role:'Owner',activeSession:null,lastSeen:0,created:new Date().toISOString()});
+    saveAccounts(a);
+  }
+}
+function getSession(){
+  try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){return null}
+}
+function isSessionValid(){
+  const s=getSession(); if(!s)return false;
+  if(Date.now()-s.lastSeen>=SESSION_TTL)return false;
+  const x=getAccounts().find(v=>v.user===s.user);
+  return !!x&&x.activeSession===s.id;
+}
+function touchSession(){
+  const s=getSession(); if(!s)return;
+  s.lastSeen=Date.now(); localStorage.setItem(SESSION_KEY,JSON.stringify(s));
+  const a=getAccounts(),i=a.findIndex(x=>x.user===s.user);
+  if(i>=0){a[i].activeSession=s.id;a[i].lastSeen=s.lastSeen;saveAccounts(a)}
+}
+function loginSite(){
+  ensureOwner();
+  const user=document.getElementById('siteUser').value.trim();
+  const pass=document.getElementById('sitePass').value;
+  const err=document.getElementById('siteLoginError');
+  const a=getAccounts(), account=a.find(x=>x.user.toLowerCase()===user.toLowerCase() && x.pass===pass);
+  if(!account){err.textContent='Usuario o contraseña incorrectos.';err.style.display='block';return}
+  const now=Date.now();
+  if(account.activeSession && now-account.lastSeen<SESSION_TTL){
+    err.textContent='Esta cuenta ya tiene una sesión activa.';
+    err.style.display='block';return;
+  }
+  const session={id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()),user:account.user,lastSeen:now};
+  account.activeSession=session.id;account.lastSeen=now;saveAccounts(a);
+  localStorage.setItem(SESSION_KEY,JSON.stringify(session));
+  document.getElementById('siteLogin').classList.add('hidden');
+  touchSession();updateUserBox();logEvent('Inició sesión en el panel');pollServer(true);
+  document.getElementById('siteUser').value='';document.getElementById('sitePass').value='';err.style.display='none';
+}
+function logoutSite(){
+  const s=getSession(); if(!s)return;
+  logEvent('Cerró sesión');
+  const a=getAccounts(),i=a.findIndex(x=>x.user===s.user);
+  if(i>=0){a[i].activeSession=null;a[i].lastSeen=0;saveAccounts(a)}
+  localStorage.removeItem(SESSION_KEY);
+  logsUnlocked=false;accountManagerUnlocked=false;openPage('dashboard');
+  document.getElementById('siteLogin').classList.remove('hidden');
+}
+function bootSiteAuth(){
+  ensureOwner();
+  if(isSessionValid()){document.getElementById('siteLogin').classList.add('hidden');touchSession();updateUserBox()}
+}
+setInterval(()=>{if(isSessionValid())touchSession();else if(document.getElementById('siteLogin').classList.contains('hidden')){logEvent('Sesión finalizada por inactividad o inicio en otro lugar');localStorage.removeItem(SESSION_KEY);logsUnlocked=false;accountManagerUnlocked=false;openPage('dashboard');document.getElementById('siteLogin').classList.remove('hidden')}},10000);
+
+
+
+function amGetAccounts(){try{return JSON.parse(localStorage.getItem('staff_v11_accounts_v1')||'[]')}catch(e){return[]}}
+function amSaveAccounts(a){localStorage.setItem('staff_v11_accounts_v1',JSON.stringify(a))}
+function amSessionActive(x){return !!(x.activeSession&&Date.now()-x.lastSeen<120000)}
+function amRefresh(){
+  const a=amGetAccounts(), body=document.getElementById('amAccountsBody'), count=document.getElementById('amAccountCount');
+  if(!body||!count)return;
+  count.textContent=a.length+' '+(a.length===1?'cuenta':'cuentas');
+  body.innerHTML=a.map(x=>{
+    const active=amSessionActive(x);
+    const safe=x.user.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<tr><td><b>${x.user}</b></td><td><span class="am-badge ${x.role==='Owner'?'am-owner':'am-on'}">${x.role}</span></td><td>${active?'<span class="am-badge am-on">ACTIVA</span>':'<span class="am-badge am-off">LIBRE</span>'}</td><td>${x.created?new Date(x.created).toLocaleDateString('es-DO'):''}</td><td>${x.user==='dottygunner'?'<span style="color:#587466;font-size:7px">OWNER</span>':`<button class="am-action" onclick="amForceLogout('${safe}')">Cerrar sesión</button> <button class="am-action" onclick="amDeleteAccount('${safe}')">Eliminar</button>`}</td></tr>`;
+  }).join('') || '<tr><td colspan="5" style="text-align:center;color:#557265;padding:30px">No hay cuentas.</td></tr>';
+}
+function amCreateAccount(){
+  const u=document.getElementById('amNewUser').value.trim(), p=document.getElementById('amNewPass').value, r=document.getElementById('amNewRole').value, a=amGetAccounts(), m=document.getElementById('amCreateMsg');
+  if(!u||!p){m.textContent='Completa usuario y contraseña.';m.className='am-msg bad';return}
+  if(p.length<6){m.textContent='La contraseña debe tener al menos 6 caracteres.';m.className='am-msg bad';return}
+  if(a.some(x=>x.user.toLowerCase()===u.toLowerCase())){m.textContent='Ese usuario ya existe.';m.className='am-msg bad';return}
+  a.push({user:u,pass:p,role:r,activeSession:null,lastSeen:0,created:new Date().toISOString()});amSaveAccounts(a);
+  document.getElementById('amNewUser').value='';document.getElementById('amNewPass').value='';
+  m.textContent='Cuenta creada correctamente.';m.className='am-msg ok';amRefresh();toast('Cuenta creada');
+}
+function amForceLogout(u){const a=amGetAccounts(),x=a.find(v=>v.user===u);if(x){x.activeSession=null;x.lastSeen=0;amSaveAccounts(a);amRefresh();toast('Sesión cerrada')}}
+function amDeleteAccount(u){if(u==='dottygunner'){toast('La cuenta Owner no puede eliminarse');return}if(!confirm('¿Eliminar la cuenta '+u+'?'))return;amSaveAccounts(amGetAccounts().filter(x=>x.user!==u));amRefresh();toast('Cuenta eliminada')}
+function amLogout(){accountManagerUnlocked=false;openPage('dashboard');toast('Sesión de Account Manager cerrada')}
+
+let accountManagerUnlocked=false;
+function accountList(){
+  try{return JSON.parse(localStorage.getItem('staff_v11_accounts_v1')||'[]')}catch(e){return[]}
+}
+function requestAccountManager(e){
+  if(e)e.stopPropagation();
+  if(accountManagerUnlocked){openPage('accountmanager');renderAccountStats();return}
+  document.getElementById('amLogin').classList.add('show');
+  setTimeout(()=>document.getElementById('amUser').focus(),80);
+}
+function loginAccountManager(){
+  const u=document.getElementById('amUser').value.trim(),p=document.getElementById('amPass').value;
+  const err=document.getElementById('amError');
+  const a=accountList(),x=a.find(v=>v.user===u&&v.pass===p&&v.role==='Owner');
+  if(!x){err.style.display='block';return}
+  accountManagerUnlocked=true;err.style.display='none';document.getElementById('amLogin').classList.remove('show');openPage('accountmanager');renderAccountStats();toast('Account Manager autorizado');
+}
+function renderAccountStats(){
+  amRefresh();
+  const a=accountList(),active=a.filter(x=>x.activeSession&&Date.now()-x.lastSeen<120000).length;
+  const c=document.getElementById('amCount'),ac=document.getElementById('amActive'),fr=document.getElementById('amFree');
+  if(c)c.textContent=a.length;if(ac)ac.textContent=active;if(fr)fr.textContent=Math.max(0,a.length-active);
+}
+
+let logsUnlocked=false;
+function requestLogsLogin(e){
+  if(e) e.stopPropagation();
+  if(logsUnlocked){openPage('logs');return}
+  document.getElementById('logsLogin').classList.add('show');
+  setTimeout(()=>document.getElementById('logUser').focus(),80);
+}
+function loginLogs(){
+  const user=document.getElementById('logUser').value.trim();
+  const pass=document.getElementById('logPass').value;
+  const error=document.getElementById('loginError');
+  if(user==='dottygunner' && pass==='1212131415'){
+    logsUnlocked=true;
+    error.style.display='none';
+    document.getElementById('logsLogin').classList.remove('show');
+    document.getElementById('logPass').value='';
+    openPage('logs');
+    toast('Acceso a logs autorizado');
+  }else{
+    error.style.display='block';
+    document.getElementById('logPass').select();
+  }
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter' && document.getElementById('siteLogin').classList.contains('hidden')===false) loginSite();
+  if(e.key==='Enter' && document.getElementById('amLogin').classList.contains('show')) loginAccountManager();
+  if(e.key==='Enter' && document.getElementById('logsLogin').classList.contains('show')) loginLogs();
+  if(e.key==='Escape' && document.getElementById('logsLogin').classList.contains('show')) document.getElementById('logsLogin').classList.remove('show');
+  if(e.key==='Escape'){closeModal();closeServerModal()}
+  if(e.key==='Enter' && document.getElementById('serverModal').classList.contains('show')) saveServer();
+});
+
+function openPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));if(id==='staff')renderStaff();const t=titles[id]||['Staff Account Manager','Gestión de cuentas autorizadas'];document.getElementById('title').textContent=t[0];document.getElementById('subtitle').textContent=t[1];if(id==='accountmanager'&&!window._amLogged){window._amLogged=true;logEvent('Abrió el Staff Account Manager');setTimeout(()=>window._amLogged=false,60000)}}
+document.addEventListener('click',e=>{let n=e.target.closest('[data-page]');if(n)openPage(n.dataset.page)})
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function ago(ts,skew){const s=Math.max(0,Math.floor(Date.now()/1000+(skew||0)-ts));if(s<45)return 'hace un momento';if(s<3600)return 'hace '+Math.max(1,Math.round(s/60))+' min';if(s<86400)return 'hace '+Math.floor(s/3600)+' h';return new Date(ts*1000).toLocaleDateString('es-DO')}
+function fmtUp(s){s=Math.floor(s||0);const d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);return d?d+' d '+h+' h':h?h+' h '+m+' min':m+' min'}
+function emptyRow(cols,msg){return `<tr><td colspan="${cols}" class="empty">${msg}</td></tr>`}
+function offMsg(){return !srvCfg?'Aún no hay servidor configurado. Pulsa «Conectar servidor» e introduce la IP.':esc(srv.err||'Conectando…')}
+
+function row(p){const n=esc(p[0]);return `<tr><td><div class="player"><div class="picon">${esc((p[0]||'?').charAt(0).toUpperCase())}</div><div><b>${n}</b><small>ID #${esc(p[1])}</small></div></div></td><td>${esc(p[1])}</td><td>${esc(p[2])}</td><td>${esc(p[3])} ms</td><td><span class="badge ${p[4]==='staff'?'bblue':'bgreen'}">${p[4]==='staff'?'STAFF':'ONLINE'}</span></td><td><div class="actions"><button class="mini" data-n="${n}" onclick="openModal('Acciones · '+this.dataset.n,this.dataset.n)">⋯</button><button class="mini" data-n="${n}" onclick="viewProfile(this.dataset.n)">V</button></div></td></tr>`}
+function renderPlayers(){
+  const q=(document.getElementById('search')?.value||'').toLowerCase(),f=document.getElementById('playerFilter')?.value||'';
+  const list=players.filter(p=>p.join(' ').toLowerCase().includes(q)&&(!f||p[4]===f));
+  const empty=srv.ok?emptyRow(6,'No hay jugadores conectados.'):emptyRow(6,offMsg());
+  document.getElementById('fullPlayers').innerHTML=list.length?list.map(row).join(''):(players.length?emptyRow(6,'Sin resultados.'):empty);
+  document.getElementById('dashPlayers').innerHTML=players.length?players.slice(0,5).map(row).join(''):empty;
+}
+function renderReports(){
+  const f=document.getElementById('reportFilter')?.value||'',sk=srv.skew||0;
+  const all=reports.slice().reverse(),list=all.filter(r=>!f||r.pri===f);
+  const pc=r=>r.pri==='Alta'?'high':r.pri==='Media'?'med':'low';
+  const msg=srv.ok?'No hay reportes pendientes.':offMsg();
+  document.getElementById('reportsList').innerHTML=list.length?list.map(r=>`<div class="report"><div class="rid">#${esc(r.id)}</div><div><b>${esc(r.msg)}</b><small>Reportado por ${esc(r.by)} · ${ago(r.t,sk)}</small></div><span class="priority ${pc(r)}">${esc(String(r.pri).toUpperCase())}</span></div>`).join(''):`<div class="empty">${all.length?'Sin resultados.':msg}</div>`;
+  document.getElementById('miniReports').innerHTML=all.length?all.slice(0,4).map(r=>`<div class="activity"><div class="aicon">!</div><div><b>${esc(r.msg)}</b><small>${esc(r.by)} · #${esc(r.id)}</small></div><span class="time">${ago(r.t,sk)}</span></div>`).join(''):`<div class="empty">${msg}</div>`;
+}
+function renderStaff(){
+  const a=getAccounts(),perm={Owner:'Total',Administrador:'Total',Moderador:'Moderación',Soporte:'Soporte'};
+  document.getElementById('staffBody').innerHTML=a.length?a.map(s=>{const on=!!(s.activeSession&&Date.now()-s.lastSeen<120000);return `<tr><td><div class="player"><div class="picon">${esc(String(s.user).charAt(0).toUpperCase())}</div><b>${esc(s.user)}</b></div></td><td><span class="badge ${s.role==='Owner'||s.role==='Administrador'?'bred':s.role==='Moderador'?'byellow':'bblue'}">${esc(String(s.role).toUpperCase())}</span></td><td>${perm[s.role]||'—'}</td><td><span class="badge ${on?'bgreen':'bgray'}">${on?'ONLINE':'OFFLINE'}</span></td><td><button class="mini" data-n="${esc(s.user)}" onclick="toast('Cuenta '+this.dataset.n)">V</button></td></tr>`}).join(''):emptyRow(5,'No hay cuentas.');
+}
+function renderPunish(){document.getElementById('punishBody').innerHTML=punish.length?punish.map(p=>`<tr><td>${esc(p[0])}</td><td><span class="badge ${p[1]==='BAN'?'bred':p[1]==='KICK'?'byellow':'bblue'}">${esc(p[1])}</span></td><td>${esc(p[2])}</td><td>${esc(p[3])}</td><td>${esc(p[4])}</td></tr>`).join(''):emptyRow(5,'Todavía no hay sanciones registradas.')}
+function logItem(l){return `<div class="activity"><div class="aicon">•</div><div><b>${esc(l[0])}</b><small>${esc(l[1])}</small></div><span class="time">${ago(l[2])}</span></div>`}
+function renderLogs(){const h=logs.length?null:'<div class="empty">Todavía no hay actividad en el panel.</div>';document.getElementById('logsList').innerHTML=h||logs.map(logItem).join('');document.getElementById('activity').innerHTML=h||logs.slice(0,5).map(logItem).join('')}
+function renderTickets(){document.getElementById('ticketsList').innerHTML='<div class="empty">Todavía no hay tickets.</div>'}
+function chart(){
+  const el=document.getElementById('chart'),lb=document.getElementById('chartLabels');
+  if(!srv.ok){el.innerHTML='<div class="empty" style="width:100%;align-self:center">'+(srvCfg?'Sin datos del servidor.':'Conecta el servidor para ver la actividad.')+'</div>';lb.innerHTML='';return}
+  const now=Math.floor(Date.now()/1000+srv.skew),cur=Math.floor(now/3600)*3600,b=[];
+  for(let i=7;i>=0;i--){const s=cur-i*3600,pts=history.filter(h=>h.t>=s&&h.t<s+3600);b.push({s,v:pts.length?Math.max(...pts.map(h=>h.n)):null})}
+  const mx=Math.max(1,...b.map(x=>x.v||0));
+  el.innerHTML=b.map(x=>`<i class="barc" title="${x.v==null?'Sin datos':x.v+' jugadores (máx.)'}" style="height:${x.v==null?3:Math.max(6,x.v/mx*100)}%;${x.v==null?'opacity:.25':''}"></i>`).join('');
+  lb.innerHTML=b.map(x=>`<span>${String(new Date(x.s*1000).getHours()).padStart(2,'0')}:00</span>`).join('');
+}
+function renderStats(){
+  const on=srv.ok,set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+  const hi=reports.filter(r=>r.pri==='Alta').length,st=players.filter(p=>p[4]==='staff').length;
+  set('sPlayers',on?players.length:'–');set('sPlayersT',on?(srv.name||'Servidor conectado'):'Sin conexión');
+  set('sReports',on?reports.length:'–');set('sReportsT',on?hi+' prioridad alta':'Sin conexión');
+  set('sStaff',on?st:'–');set('sStaffT',on?(players.length?Math.round(st/players.length*100)+'% de los jugadores':'Sin jugadores'):'Sin conexión');
+  set('sSlots',on?players.length+'/'+srv.max:'–');set('sSlotsT',on&&srv.max?Math.round(players.length/srv.max*100)+'% ocupado':'Sin conexión');
+  set('sUptime',on?fmtUp(srv.uptime):'–');set('sUptimeT',on?'Desde que inició el recurso':'Sin conexión');
+  set('cPlayers',players.length);set('cReports',reports.length);
+}
+function renderAll(){
+  if(specTarget)specTarget=players.find(x=>x[0]===specTarget[0])||null;
+  renderPlayers();renderReports();renderStaff();renderPunish();renderLogs();renderTickets();chart();renderStats();specShow();
+  document.getElementById('playerList').innerHTML=players.map(p=>`<option value="${esc(p[0])}">`).join('');
+}
+
+/* ---- Conexión con el servidor MTA:SA (recurso staffpanel, por IP) ---- */
+let polling=false;
+function srvHost(c){return c.ip+(c.https&&c.port==='443'?'':':'+c.port)}
+function srvUrl(){const c=srvCfg;return (c.https?'https':'http')+'://'+srvHost(c)+'/'+c.res+'/status.html'+(c.key?'?key='+encodeURIComponent(c.key):'')}
+function resetSrv(){srv={ok:false,err:'',ms:0,max:0,uptime:0,name:'',skew:0};players=[];reports=[];history=[]}
+async function pollServer(manual){
+  if(!srvCfg||polling)return;
+  if(!manual&&!document.getElementById('siteLogin').classList.contains('hidden'))return;
+  polling=true;const t0=performance.now(),ctrl=new AbortController(),to=setTimeout(()=>ctrl.abort(),6000);
+  try{
+    const r=await fetch(srvUrl(),{cache:'no-store',signal:ctrl.signal});
+    if(r.status===403)throw new Error('Clave incorrecta.');
+    if(r.status===401)throw new Error('El servidor pidió autenticación. Revisa los permisos ACL del recurso.');
+    if(!r.ok)throw new Error('El servidor respondió '+r.status+'. ¿El recurso está iniciado?');
+    const d=await r.json();
+    if(!d.ok)throw new Error(d.error||'Respuesta no válida del servidor.');
+    srv={ok:true,err:'',ms:Math.round(performance.now()-t0),max:d.max||0,uptime:d.uptime||0,name:d.server||'',skew:(d.now||0)-Date.now()/1000};
+    players=(d.players||[]).map(p=>[p.name,p.id,p.job,p.ping,p.staff?'staff':'online',p.zone||'']);
+    reports=d.reports||[];history=d.history||[];
+  }catch(e){
+    resetSrv();
+    srv.err=e.name==='AbortError'?'Tiempo de espera agotado. El servidor no respondió.':(e instanceof TypeError||e.name==='SyntaxError')?'No se pudo conectar. Revisa la IP y el puerto HTTP, que el recurso «'+srvCfg.res+'» esté iniciado y que el puerto esté abierto.'+(location.protocol==='https:'&&!srvCfg.https?' Esta página está en HTTPS y el navegador bloquea conexiones http://. Usa una dirección https:// para tu servidor (por ejemplo un túnel de Cloudflare).':''):e.message;
+  }finally{clearTimeout(to);polling=false;renderAll();updateServerUI()}
+}
+function setSrvMsg(t,bad){const e=document.getElementById('srvMsg');e.textContent=t||'';e.className='srvmsg'+(t?(bad?' bad':' ok'):'')}
+function updateServerUI(){
+  const d=document.getElementById('liveDot'),t=document.getElementById('liveTxt'),b=document.getElementById('srvBtn');
+  if(srv.ok){d.classList.remove('off');t.textContent='LIVE';b.textContent=srvHost(srvCfg)+' · '+srv.ms+' ms'}
+  else{d.classList.add('off');t.textContent=srvCfg?'DESCONECTADO':'SIN SERVIDOR';b.textContent=srvCfg?'Reconectar servidor':'Conectar servidor'}
+  if(document.getElementById('serverModal').classList.contains('show'))setSrvMsg(srv.ok?'Conectado a '+(srv.name||srvCfg.ip)+' ('+srv.ms+' ms).':(srvCfg?srv.err:''),!srv.ok);
+}
+function openServerModal(){const c=srvCfg||{};document.getElementById('srvIp').value=c.ip?(c.https?'https://':'')+c.ip:'';document.getElementById('srvPort').value=c.port||'22005';document.getElementById('srvRes').value=c.res||'staffpanel';document.getElementById('srvKey').value=c.key||'';document.getElementById('serverModal').classList.add('show');updateServerUI();setTimeout(()=>document.getElementById('srvIp').focus(),60)}
+function closeServerModal(){document.getElementById('serverModal').classList.remove('show')}
+async function saveServer(){
+  const raw=document.getElementById('srvIp').value.trim(),https=/^https:\/\//i.test(raw);
+  let ip=raw.replace(/^https?:\/\//i,'').replace(/[\/\s].*$/,''),port=https?'443':(document.getElementById('srvPort').value.trim()||'22005');
+  const res=document.getElementById('srvRes').value.trim().replace(/[^\w\-]/g,'')||'staffpanel',key=document.getElementById('srvKey').value.trim();
+  if(ip.includes(':')){const m=ip.split(':');ip=m[0];if(m[1])port=m[1]}
+  if(!ip){setSrvMsg('Escribe la IP del servidor.',true);return}
+  if(!/^\d{1,5}$/.test(port)||+port>65535){setSrvMsg('El puerto no es válido.',true);return}
+  srvCfg={ip,port,res,key,https};lsSet(LS_SRV,srvCfg);resetSrv();
+  logEvent('Configuró la conexión al servidor '+srvHost(srvCfg));
+  setSrvMsg('Conectando…');await pollServer(true);
+  if(srv.ok){closeServerModal();toast('Servidor conectado')}
+}
+function disconnectServer(){
+  if(srvCfg)logEvent('Desconectó el servidor '+srvHost(srvCfg));
+  srvCfg=null;localStorage.removeItem(LS_SRV);resetSrv();renderAll();updateServerUI();setSrvMsg('');closeServerModal();toast('Servidor desconectado');
+}
+function refreshNow(){if(!srvCfg){openServerModal();return}pollServer(true).then(()=>toast(srv.ok?'Datos actualizados':'No se pudo actualizar'))}
+function notif(){const n=reports.length;toast(n?n+(n===1?' reporte pendiente':' reportes pendientes'):'No hay notificaciones nuevas')}
+setInterval(()=>pollServer(),5000);
+setInterval(()=>{renderLogs();renderReports()},30000);
+renderAll();renderAccountStats();bootSiteAuth();updateServerUI();if(srvCfg&&isSessionValid())pollServer(true);
+</script>
+</body>
+</html>
